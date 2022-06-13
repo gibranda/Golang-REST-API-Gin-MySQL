@@ -4,6 +4,8 @@ RUN apk --no-cache add gcc g++ make git
 
 LABEL Maintainer="Gibranda <gibranda.randa@gmail.com>"
 
+WORKDIR /app
+
 COPY . .
 
 RUN go get -d -v ./...
