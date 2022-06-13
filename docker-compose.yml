@@ -1,0 +1,72 @@
+version: "3.3"
+services: 
+  restful-api:
+    container_name: RESTful-API-Go-Endpoint
+    depends_on:
+      - database
+    restart: always
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      MONGO_SERVICE_NAME: database
+      API_PORT: 8081
+    networks:
+      rest_api_go_endpoint_network:
+        aliases:
+          - myapi
+  
+  fullstack-mysql:
+    image: mysql:5.7
+    container_name: full_db_mysql
+    ports: 
+      - 3306:3306
+    environment: 
+      - MYSQL_ROOT_HOST=0.0.0.0 
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+      - MYSQL_DATABASE=admin
+      - MYSQL_ROOT_PASSWORD=admin
+    volumes:
+      - database_mysql:/var/lib/mysql
+    networks:
+      - fullstack
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_container
+    depends_on:
+      - fullstack-mysql
+    environment:
+      - PMA_HOST=fullstack-mysql
+      - PMA_USER=admin
+      - PMA_PORT=8080
+      - PMA_PASSWORD=admin
+    ports:
+      - 9090:80
+    restart: always
+    networks:
+      - fullstack
+  
+  nginx:
+    container_name: Nginx-Proxy
+    depends_on:
+      - restful-api
+    restart: always
+    build:
+      context: ./Nginx
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - ./Nginx:/var/log/nginx
+    networks:
+      - rest_api_go_endpoint_network
+
+volumes:
+  mongodata:
+  Nginx:
+
+networks:
+  rest_api_go_endpoint_network:
+    driver: bridge
