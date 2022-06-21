@@ -25,8 +25,18 @@ import (
 	"gorm.io/gorm"
 )
 
+type config struct {
+	DbUser string `env:"DB_USER"`
+	DbPass string `env:"DB_PASSWORD"`
+	DbName string `env:"DB_DATABASE"`
+	DbHost string `env:"DB_HOST"`
+	DbPort string `env:"DB_PORT" envDefault:"3306"`
+}
+
 func main() {
-	dsn := "root:aksikode@tcp(127.0.0.1:3306)/bwastartup?charset=utf8mb4&parseTime=True&loc=Local"
+	cfg := config{}
+
+	dsn := cfg.DbUser + ":" + cfg.DbPass + "@tcp(" + cfg.DbHost + ":" + cfg.DbPort + ")/" + cfg.DbName + "?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {

@@ -1,7 +1,7 @@
 version: "3.3"
 
 services:
-  vaksinln-api:
+  go-api:
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,8 +9,8 @@ services:
       - mysql-db
     restart: on-failure
     environment:
-      DB_HOST: "mysql-db"
-      DB_PORT: "5432"
+      DB_HOST: "my_db"
+      DB_PORT: "3306"
       DB_USER: "db_user"
       DB_PASSWORD: "my_password"
       DB_DATABASE: "app_db"
@@ -19,7 +19,7 @@ services:
     ports:
       - "7050:6666"
     networks:
-      - vaksinln-network
+      - go-network
   mysql-db:
     image: mysql:5.7
     container_name: my_db
@@ -32,20 +32,24 @@ services:
       - "6033:3306"
     volumes:
       - dbdata:/var/lib/mysql
+    networks:
+      - go-network
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: pma
     links:
       - mysql-db
     environment:
-      PMA_HOST: mysql-db
+      PMA_HOST: my_db
       PMA_PORT: 3306
       PMA_ARBITRARY: 1
     restart: always
     ports:
       - 8081:80
+    networks:
+      - go-network
 networks:
-  vaksinln-network:
+  go-network:
     driver: bridge
 volumes:
   dbdata:
