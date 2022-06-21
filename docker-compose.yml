@@ -1,70 +1,51 @@
 version: "3.3"
-services: 
-  restful-api:
-    container_name: RESTful-API-Go-Endpoint
-    depends_on:
-      - database-mysql
-    restart: always
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    volumes:
-      - api:/usr/src/app/
-    networks:
-      - rest_api_go_endpoint_network
-  
-  database-mysql:
-    image: mysql:5.7
-    container_name: full_db_mysql
-    ports: 
-      - 3306:3306
-    environment: 
-      - MYSQL_ROOT_HOST=0.0.0.0 
-      - MYSQL_USER=admin
-      - MYSQL_PASSWORD=admin
-      - MYSQL_DATABASE=admin
-      - MYSQL_ROOT_PASSWORD=admin
-    volumes:
-      - database_mysql:/var/lib/mysql
-    networks:
-      - rest_api_go_endpoint_network
 
+services:
+  vaksinln-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql-db
+    restart: on-failure
+    environment:
+      DB_HOST: "postgres-db"
+      DB_PORT: "5432"
+      DB_USER: "postgres"
+      DB_PASSWORD: "my_password"
+      DB_DATABASE: "postgres"
+      HTTP_PORT: 6666
+      HTTP_SERVER_TIMEOUT: 50
+    ports:
+      - "7050:6666"
+    networks:
+      - vaksinln-network
+  mysql-db:
+    image: mysql:5.7
+    container_name: my_db
+    environment:
+      MYSQL_ROOT_PASSWORD: my_password
+      MYSQL_DATABASE: app_db
+      MYSQL_USER: db_user
+      MYSQL_PASSWORD: my_password
+    ports:
+      - "6033:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin_container
-    depends_on:
-      - database-mysql
+    container_name: pma
+    links:
+      - mysql-db
     environment:
-      - PMA_HOST=fullstack-mysql
-      - PMA_USER=admin
-      - PMA_PORT=8080
-      - PMA_PASSWORD=admin
-    ports:
-      - 9090:80
+      PMA_HOST: mysql-db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
     restart: always
-    networks:
-      - rest_api_go_endpoint_network
-  
-  nginx:
-    container_name: Nginx-Proxy
-    depends_on:
-      - restful-api
-    restart: always
-    build:
-      context: ./Nginx
-      dockerfile: Dockerfile
     ports:
-      - 8080:8080
-    volumes:
-      - ./Nginx:/var/log/nginx
-    networks:
-      - rest_api_go_endpoint_network
-
-volumes:
-  database_mysql:
-  Nginx:
-  api:
-
+      - 8081:80
 networks:
-  rest_api_go_endpoint_network:
+  vaksinln-network:
     driver: bridge
+volumes:
+  vaksinlndb:

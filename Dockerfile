@@ -1,17 +1,22 @@
-FROM golang:1.15.6-alpine3.12
+FROM golang:1.17.9-alpine3.15 as build-env
 
-RUN apk --no-cache add gcc g++ make git
-
-LABEL Maintainer="Gibranda <gibranda.randa@gmail.com>"
+RUN apk update && apk upgrade && \
+    apk add --no-cache bash git openssh
 
 WORKDIR /app
 
 COPY . .
 
+#RUN go clean -modcache
+
+RUN go mod tidy 
+
 RUN go get -d -v ./...
 
-RUN go install -v ./...
+RUN CGO_ENABLED=0 go build -o /go/bin/app
 
-EXPOSE 8080
+FROM gcr.io/distroless/static
 
-CMD ["RESTful-API-Go-Endpoint"]
+COPY --from=build-env /go/bin/app /
+
+CMD ["/app"]
