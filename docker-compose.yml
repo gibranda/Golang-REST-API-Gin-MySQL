@@ -9,11 +9,11 @@ services:
       - mysql-db
     restart: on-failure
     environment:
-      DB_HOST: "postgres-db"
+      DB_HOST: "mysql-db"
       DB_PORT: "5432"
-      DB_USER: "postgres"
+      DB_USER: "db_user"
       DB_PASSWORD: "my_password"
-      DB_DATABASE: "postgres"
+      DB_DATABASE: "app_db"
       HTTP_PORT: 6666
       HTTP_SERVER_TIMEOUT: 50
     ports:
@@ -48,4 +48,4 @@ networks:
   vaksinln-network:
     driver: bridge
 volumes:
-  vaksinlndb:
+  dbdata:
