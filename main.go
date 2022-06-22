@@ -65,7 +65,7 @@ func main() {
 	router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{"POST", "PUT", "PATCH", "DELETE"},
-		AllowHeaders: []string{"Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers"},
+		AllowHeaders: []string{"Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, strict-origin-when-cross-origin, Authorization"},
 	}))
 
 	cookieStore := cookie.NewStore([]byte(auth.SECRET_KEY))
