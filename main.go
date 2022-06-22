@@ -34,9 +34,7 @@ type config struct {
 }
 
 func main() {
-	cfg := config{}
-
-	dsn := cfg.DbUser + ":" + cfg.DbPass + "@tcp(" + cfg.DbHost + ":" + cfg.DbPort + ")/" + cfg.DbName + "?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "db_user:my_password@tcp(my_db:3306)/app_db?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {

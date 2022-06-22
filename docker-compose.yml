@@ -17,7 +17,7 @@ services:
       HTTP_PORT: 6666
       HTTP_SERVER_TIMEOUT: 50
     ports:
-      - "7050:6666"
+      - "7050:8080"
     networks:
       - go-network
   mysql-db:
